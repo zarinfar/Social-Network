@@ -5,5 +5,8 @@
 {% block page_content %}
 <div class="page-header">
     <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
-</div>
+    <P>if you try to change your email click here! <a href="{{ url_for('auth.change_email_request') }}">change email request</a></P>
+    <P>if you try to change your password click here! <a href="{{ url_for('auth.change_password') }}">change password request</a></P>
+    {% if current_user.is_anonymous %}<P>if you try to register click here! <a href="{{ url_for('auth.register') }}">register</a></P>{% endif %}
+
 {% endblock %}

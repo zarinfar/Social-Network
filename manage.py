@@ -24,5 +24,9 @@ def test():
     unittest.TextTestRunner(verbosity=2).run(tests)
 
 
+@manager.command
+def run():
+    app.run(port=5001)
+
 if __name__ == '__main__':
     manager.run()
