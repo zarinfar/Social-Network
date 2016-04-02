@@ -9,10 +9,9 @@ class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
-    default = db.column(db.boolean, default=False, insex=True)
+    default = db.Column(db.Boolean, default=False, index=True)
     users = db.relationship('User', backref='role', lazy='dynamic')
-    permissions = db.column(db.Integer)
-
+    permissions = db.Column(db.Integer)
     def __repr__(self):
         return '<Role %r>' % self.name
 
@@ -95,6 +94,15 @@ class User(UserMixin, db.Model):
         self.email = new_email
         db.session.add(self)
         return True
+
+
+class Permission:
+    FOLLOW = 0x01
+    COMMENT = 0x02
+    WRITE_ARTICLES = 0x04
+    MODERATE_COMMENT = 0x08
+    ADMINISTRATOR = 0X80
+
 
 
 @login_manager.user_loader
