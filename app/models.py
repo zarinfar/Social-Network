@@ -38,7 +38,7 @@ class Role(db.Model):
 
     def __repr__(self):
         return '<Role %r>' % self.name
-
+# یسذتیسذ
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
