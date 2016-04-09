@@ -5,12 +5,13 @@ from . import db, login_manager
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from datetime import datetime
 
+
 class Permission:
     FOLLOW = 0x01
     COMMENT = 0x02
     WRITE_ARTICLES = 0x04
-    MODERATE_COMMENT = 0x08
-    ADMINISTER = 0X80
+    MODERATE_COMMENTS = 0x08
+    ADMINISTER = 0x80
 
 
 class Role(db.Model):
@@ -23,10 +24,16 @@ class Role(db.Model):
 
     @staticmethod
     def insert_roles():
-        roles = {'User': (Permission.FOLLOW | Permission.COMMENT | Permission.WRITE_ARTICLES, True),
-                 'Moderator': (Permission.FOLLOW | Permission.COMMENT | Permission.WRITE_ARTICLES | Permission.MODERATE_COMMENT, False),
-                 'Administrator': (0xff, False)
-                 }
+        roles = {
+            'User': (Permission.FOLLOW |
+                     Permission.COMMENT |
+                     Permission.WRITE_ARTICLES, True),
+            'Moderator': (Permission.FOLLOW |
+                          Permission.COMMENT |
+                          Permission.WRITE_ARTICLES |
+                          Permission.MODERATE_COMMENTS, False),
+            'Administrator': (0xff, False)
+         }
         for r in roles:
             role = Role.query.filter_by(name=r).first()
             if role is None:
@@ -38,7 +45,7 @@ class Role(db.Model):
 
     def __repr__(self):
         return '<Role %r>' % self.name
-# یسذتیسذ
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -57,6 +64,14 @@ class User(UserMixin, db.Model):
     def ping(self):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
+
+    # def __init__(self, **kwargs):
+    #     super(User, self).__init__(**kwargs)
+    #     if self.role is None:
+    #         if self.email and self.email == current_app.config['FLASKY_ADMIN']:
+    #             self.role = Role.query.filter_by(permissions=0xff).first()
+    #         if self.role is None:
+    #             self.role = Role.query.filter_by(default=True).first()
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -138,7 +153,7 @@ class User(UserMixin, db.Model):
 
     def can(self, permissions):
         return self.role is not None and \
-            (self.role.permissions & permissions) == permissions
+               (self.role.permissions & permissions) == permissions
 
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
@@ -153,6 +168,7 @@ class AnonymousUser(AnonymousUserMixin):
 
     def is_administrator(self):
         return False
+
 
 login_manager.anonymous_user = AnonymousUser
 
